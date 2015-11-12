@@ -7,6 +7,8 @@ PictShare stats is a statistics tool for the open source image hosting service [
 This tool will analyze your webservers log files, extract requests + traffic and caches them to the server.
 It will automatically parse the time from the log file so you don't have to worry about rotating log files since the tool doesn't remember which line was the last but what actual time
 
+## [Live example](http://stats.pictshare.net/#e7f7c6cb10.jpg)
+
 ## Setup
 
 1. After cloning the repo, change the two settings in analyze.php ```LOG_FILE``` and ```PICTSHARE_URL``` `
