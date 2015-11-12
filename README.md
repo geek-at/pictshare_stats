@@ -1,6 +1,8 @@
 # PictShare stats
 
-PictShare stats is a statistics tool for the open source image hosting service [PictShare](https://www.pictshare.net).
+PictShare stats is a statistics tool for the open source image hosting service [PictShare](https://www.pictshare.net). It's recomended that you run it from the command line as a cronjob.
+
+![Traffic analysis tool](https://www.pictshare.net/102687fe65.gif)
 
 This tool will analyze your webservers log files, extract requests + traffic and caches them to the server.
 It will automatically parse the time from the log file so you don't have to worry about rotating log files since the tool doesn't remember which line was the last but what actual time
