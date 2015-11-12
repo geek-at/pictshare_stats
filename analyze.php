@@ -160,8 +160,9 @@ if(FILL_ZERO_VALUES)
         }
         closedir($handle);
     }
+    echo "\n\n";
 }
-echo "[OK] done. Exiting..\n\n";
+echo "[FIN] Exiting..\n\n";
 
 
 
