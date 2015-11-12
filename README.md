@@ -27,3 +27,5 @@ git clone https://github.com/chrisiaut/pictshare_stats.git temp
 cp -r temp/* pictshare_stats/. # if your pictshare stats directory is called pictshare_stats
 rm -rf temp
 ```
+
+After each update make sure your config.inc.php has all values defined in example.config.inc.php, since new options might come
