@@ -17,7 +17,7 @@ It will automatically parse the time from the log file so you don't have to worr
 
 ```bash
 # to be run from the directory where your pictshare stats directory sits in
-git clone https://github.com/chrisiaut/pictshare-stats.git temp
+git clone https://github.com/chrisiaut/pictshare_stats.git temp
 cp -r temp/* pictshare_stats/. # if your pictshare stats directory is called pictshare_stats
 rm -rf temp
 ```
