@@ -92,47 +92,76 @@ $fh = fopen("cache/lasttime.txt","w");
 fwrite($fh,$lasttime);
 fclose($fh);
 
-if(!is_array($mosttraffic)) exit('No image accessed'."\n\n");
-arsort($mosttraffic);
-
-foreach($mosttraffic as $hash=>$traffic)
+if(is_array($mosttraffic))
 {
-    $basedir = 'cache/'.$hash;
-    if(!is_dir($basedir))
-        mkdir($basedir);
-    $count = $stats[$hash]['count'];
-    $size = $stats[$hash]['traffic'];
-    $oldtraffic = @file_get_contents($basedir.'/traffic.txt');
-    $oldhits = @file_get_contents($basedir.'/hits.txt');
-    $newtraffic = ($oldtraffic+$size);
-    $newhits = $oldhits+$count;
-
-    echo "[?] $hash was viewed $count times and used ".renderSize($size)." - now produced ".renderSize(($size+$oldtraffic))." Traffic in ".($oldhits+$count)." hits\n";
-
-    $fp = fopen($basedir.'/view_log.csv','a');
-    fwrite($fp,time().";$count;$newtraffic;$newhits\n");
+    arsort($mosttraffic);
+    
+    foreach($mosttraffic as $hash=>$traffic)
+    {
+        $basedir = 'cache/'.$hash;
+        if(!is_dir($basedir))
+            mkdir($basedir);
+        $count = $stats[$hash]['count'];
+        $size = $stats[$hash]['traffic'];
+        $oldtraffic = trim(@file_get_contents($basedir.'/traffic.txt'));
+        $oldhits = trim(@file_get_contents($basedir.'/hits.txt'));
+        $newtraffic = ($oldtraffic+$size);
+        $newhits = $oldhits+$count;
+    
+        echo "[?] $hash was viewed $count times and used ".renderSize($size)." - now produced ".renderSize(($size+$oldtraffic))." Traffic in ".($oldhits+$count)." hits\n";
+    
+        $fp = fopen($basedir.'/view_log.csv','a');
+        fwrite($fp,time().";$count;$newtraffic;$newhits\n");
+        fclose($fp);
+    
+        $fp = fopen($basedir.'/traffic.txt','w');
+        fwrite($fp,$newtraffic."\n");
+        fclose($fp);
+    
+        $fp = fopen($basedir.'/hits.txt','w');
+        fwrite($fp,($oldhits+$count)."\n");
+        fclose($fp);
+    }
+    
+    $oldtraffic = trim(@file_get_contents('cache/traffic.txt'));
+    $fp = fopen('cache/traffic.txt','w');
+    fwrite($fp,($oldtraffic+$alltraffic));
     fclose($fp);
-
-    $fp = fopen($basedir.'/traffic.txt','w');
-    fwrite($fp,$newtraffic."\n");
-    fclose($fp);
-
-    $fp = fopen($basedir.'/hits.txt','w');
-    fwrite($fp,($oldhits+$count)."\n");
-    fclose($fp);
+    
+    echo "\n\n";
+    echo "[!] Traffic since last analyze: ".renderSize($alltraffic)."\n";
+    echo "[!] Old traffic: ".renderSize($oldtraffic)."\n";
+    echo "[!] All time traffic: ".renderSize(($oldtraffic+$alltraffic))."\n\n";
 }
-
-$oldtraffic = @file_get_contents('cache/traffic.txt');
-$fp = fopen('cache/traffic.txt','w');
-fwrite($fp,($oldtraffic+$alltraffic));
-fclose($fp);
-
-echo "\n\n";
-echo "[!] Traffic since last analyze: ".renderSize($alltraffic)."\n";
-echo "[!] Old traffic: ".renderSize($oldtraffic)."\n";
-echo "[!] All time traffic: ".renderSize(($oldtraffic+$alltraffic))."\n\n";
-
-
+else
+    echo '[!] No image accessed'."\n\n";
+    
+if(FILL_ZERO_VALUES)
+{
+    echo "[~] Adding 0 values to all images that were not viewed this time\n";
+    if ($handle = opendir('cache/'))
+    {
+        while (false !== ($file = readdir($handle)))
+        {
+            if ($file != "." && $file != "..")
+            {
+                if(is_dir('cache/'.$file) && !is_array($stats[$file]))
+                {
+                    $newtraffic = trim(@file_get_contents('cache/'.$file.'/traffic.txt'));
+                    $newhits = trim(@file_get_contents('cache/'.$file.'/hits.txt'));
+                    
+                    $fp = fopen('cache/'.$file.'/view_log.csv','a');
+                    fwrite($fp,time().";0;$newtraffic;$newhits\n");
+                    fclose($fp);
+                    
+                    if(!$dev) echo "\rAdded to ".++$j.' images';
+                }
+            }
+        }
+        closedir($handle);
+    }
+}
+echo "[OK] done. Exiting..\n\n";
 
 
 
