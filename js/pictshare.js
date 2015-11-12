@@ -84,7 +84,12 @@ function renderNewViews(data)
         var options = {
           title: 'Views per interval',
           curveType: 'function',
-          legend: { position: 'bottom' }
+          legend: { position: 'bottom' },
+          vAxis: { 
+              viewWindow:{
+                min:0
+              }
+          }
         };
 
         var chart = new google.visualization.LineChart(document.getElementById('view_chart'));
@@ -101,7 +106,12 @@ function renderViews(data)
         var options = {
           title: 'All views as of interval',
           curveType: 'function',
-          legend: { position: 'bottom' }
+          legend: { position: 'bottom' },
+          vAxis: { 
+              viewWindow:{
+                min:0
+              }
+          }
         };
 
         var chart = new google.visualization.LineChart(document.getElementById('allview_chart'));
@@ -118,7 +128,12 @@ function renderTraffic(data)
         var options = {
           title: 'Traffic as of interval',
           curveType: 'function',
-          legend: { position: 'bottom' }
+          legend: { position: 'bottom' },
+          vAxis: { 
+              viewWindow:{
+                min:0
+              }
+          }
         };
 
         var chart = new google.visualization.LineChart(document.getElementById('traffic_chart'));
