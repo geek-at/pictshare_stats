@@ -202,7 +202,7 @@ function isThatAnImage($path)
 {
     if(substr($path, 0, 10)=='/css/imgs/' || substr($path, 0, 12)=='/backend.php')
         return false;
-    else if(strpos($path, '.jpg') || strpos($path, '.png') || strpos($path, '.gif'))
+    else if(strpos($path, '.jpg') || strpos($path, '.png') || strpos($path, '.gif') || strpos($path, '.mp4'))
         return true;
     else return false;
 }
