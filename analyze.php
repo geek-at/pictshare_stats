@@ -82,6 +82,7 @@ foreach($lines as $line)
             $mosttraffic[$hash]+=$size;
 
             $alltraffic+=$size;
+            $allhits++;
         }
 }
 
@@ -128,10 +129,17 @@ if(is_array($mosttraffic))
     fwrite($fp,($oldtraffic+$alltraffic));
     fclose($fp);
     
+    $oldhits = trim(@file_get_contents('cache/hits.txt'));
+    $fp = fopen('cache/hits.txt','w');
+    fwrite($fp,($oldhits+$allhits));
+    fclose($fp);
+    
     echo "\n\n";
     echo "[!] Traffic since last analyze: ".renderSize($alltraffic)."\n";
     echo "[!] Old traffic: ".renderSize($oldtraffic)."\n";
     echo "[!] All time traffic: ".renderSize(($oldtraffic+$alltraffic))."\n\n";
+    echo "-------\n\n";
+    echo "[!] Hits so far (all images): ".renderSize(($oldhits+$allhits))."\n";
 }
 else
     echo '[!] No image accessed'."\n\n";

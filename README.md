@@ -29,3 +29,9 @@ rm -rf temp
 ```
 
 After each update make sure your config.inc.php has all values defined in example.config.inc.php, since new options might come
+
+## Q&A
+
+### Q: What if my pictshare instance has multiple reverse proxy gateways? How can I analyze the logs from separate log files
+The way the anaylzer is designed it doesn't rely on line numbers so you can just make a script that transfers all your log files and combines them into one file.
+This file can then be analyzed by the tool and it will still analyze it correctly 
