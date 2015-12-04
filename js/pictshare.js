@@ -5,6 +5,7 @@ var trafficdata = [];
 var fail = true;
 
 $(document).ready(function() {
+    getAllHits();
     if(window.location.hash) {
         var hash = window.location.hash.substring(1);
         renderData(hash);
@@ -49,6 +50,28 @@ function getViewCount(hash)
         url: "cache/"+hash+"/hits.txt",
         dataType: "text",
         success: function(data) {$("#views").html('<h2>Was seen '+data+' times</h2>');},
+        error:  function(data) {fail = true}
+     });
+}
+
+function getAllTrafficCount()
+{
+	$.ajax({
+        type: "GET",
+        url: "cache/traffic.txt",
+        dataType: "text",
+        success: function(data) {$("#all_served").append(', '+filesize(parseInt(data))+" traffic");},
+        error:  function(data) {fail = true}
+     });
+}
+
+function getAllHits()
+{
+	$.ajax({
+        type: "GET",
+        url: "cache/hits.txt",
+        dataType: "text",
+        success: function(data) {$("#all_served").html('Server stats: '+data+' views');getAllTrafficCount();},
         error:  function(data) {fail = true}
      });
 }
