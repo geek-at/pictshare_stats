@@ -69,7 +69,7 @@ foreach($lines as $line)
             if(INFLUX_HOST)
             {
                 $influxtime = $time.'000000000';
-                sendToInflux('hash='.$hash.',ip='.$ip.',referrer='.sanatizeStringForInflux(($referrer?$referrer:'0')).' value=1',$influxtime);
+                sendToInflux('hash='.$hash.',ip='.$ip.',referrer='.sanatizeStringForInflux(($referrer?$referrer:'0')).' value=1,size='.$size,$influxtime);
             }
             
             
