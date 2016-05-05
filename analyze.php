@@ -45,7 +45,7 @@ foreach($lines as $line)
         $sec = $tarr[3];
 
         $time = strtotime("$day-$month-$year $hour:$min:$sec");
-
+        
         $agent = str_replace('"', '', implode(' ',array_slice($arr, 11)));
 
         if($time<$lasttime || $responsecode!=200)
@@ -55,7 +55,7 @@ foreach($lines as $line)
         if($dev) echo "Analyzing $path. Is image? ".(isThatAnImage($path)?'Yes':'No')."\n";
 
         if(isThatAnImage($path))
-        {
+        {            
             if(!$data[$path])
                 $data[$path] = getDataFromURL($path);
 
@@ -65,6 +65,9 @@ foreach($lines as $line)
             if(!$hash || !$size) continue;
 
             if(!$dev) echo "\rGot ".++$count.' requests';
+            
+            $influxtime = $time.'000000000';
+            sendToInflux('hash='.$hash.',ip='.$ip.',referrer='.sanatizeStringForInflux(($referrer?$referrer:'0')).' value=1',$influxtime);
             
             if(SAVE_REFERRER)
             {
@@ -257,4 +260,21 @@ function getSizeOfPath($path,$hash)
 function sanatizeString($string)
 {
     return preg_replace("/[^a-zA-Z0-9._]+/", "", $string);
+}
+
+function sanatizeStringForInflux($string)
+{
+    $string = trim($string);
+    $string = str_replace(',','\\,',$string);
+    $string = str_replace(' ','\\ ',$string);
+    
+    return $string;
+}
+
+function sendToInflux($data,$time)
+{
+	echo "[+] ".INFLUX_HOST_MEASUREMENT.','.$data.' '.$time."\n"; //return;
+	$socket = stream_socket_client("udp://".INFLUX_HOST.":".INFLUX_HOST_UDP_PORT);
+	stream_socket_sendto($socket, INFLUX_HOST_MEASUREMENT.','.$data.' '.$time);
+	stream_socket_shutdown($socket, STREAM_SHUT_RDWR);
 }

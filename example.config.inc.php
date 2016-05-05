@@ -1,4 +1,10 @@
 <?php 
+//InfluxDB reporting
+define('INFLUX_HOST','');
+define('INFLUX_HOST_UDP_PORT','');
+define('INFLUX_HOST_MEASUREMENT','pictshare');
+
+
 //path to the access log. nginx and apache2 supported out of the box
 define('LOG_FILE','/var/log/nginx/pictshare.access.log');
 
