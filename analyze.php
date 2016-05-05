@@ -277,7 +277,7 @@ function sanatizeStringForInflux($string)
 
 function sendToInflux($data,$time)
 {
-	echo "[+] Sending to "."udp://".INFLUX_HOST.":".INFLUX_HOST_UDP_PORT.': '.INFLUX_HOST_MEASUREMENT.','.$data.' '.$time."\n"; //return;
+	//echo "[+] Sending to "."udp://".INFLUX_HOST.":".INFLUX_HOST_UDP_PORT.': '.INFLUX_HOST_MEASUREMENT.','.$data.' '.$time."\n"; //return;
 	$socket = stream_socket_client("udp://".INFLUX_HOST.":".INFLUX_HOST_UDP_PORT);
 	stream_socket_sendto($socket, INFLUX_HOST_MEASUREMENT.','.$data.' '.$time);
 	stream_socket_shutdown($socket, STREAM_SHUT_RDWR);
