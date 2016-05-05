@@ -66,8 +66,12 @@ foreach($lines as $line)
 
             if(!$dev) echo "\rGot ".++$count.' requests';
             
-            $influxtime = $time.'000000000';
-            sendToInflux('hash='.$hash.',ip='.$ip.' value=1',$influxtime);
+            if(INFLUX_HOST)
+            {
+                $influxtime = $time.'000000000';
+                sendToInflux('hash='.$hash.',ip='.$ip.',referrer='.sanatizeStringForInflux(($referrer?$referrer:'0')).' value=1',$influxtime);
+            }
+            
             
             if(SAVE_REFERRER)
             {
@@ -273,7 +277,7 @@ function sanatizeStringForInflux($string)
 
 function sendToInflux($data,$time)
 {
-	//echo "[+] ".INFLUX_HOST_MEASUREMENT.','.$data.' '.$time."\n"; //return;
+	echo "[+] Sending to "."udp://".INFLUX_HOST.":".INFLUX_HOST_UDP_PORT.': '.INFLUX_HOST_MEASUREMENT.','.$data.' '.$time."\n"; //return;
 	$socket = stream_socket_client("udp://".INFLUX_HOST.":".INFLUX_HOST_UDP_PORT);
 	stream_socket_sendto($socket, INFLUX_HOST_MEASUREMENT.','.$data.' '.$time);
 	stream_socket_shutdown($socket, STREAM_SHUT_RDWR);
