@@ -67,7 +67,7 @@ foreach($lines as $line)
             if(!$dev) echo "\rGot ".++$count.' requests';
             
             $influxtime = $time.'000000000';
-            sendToInflux('hash='.$hash.',ip='.$ip.' value=1',$influxtime);
+            sendToInflux('hash='.$hash.',ip='.$ip.',referrer='.sanatizeStringForInflux(($referrer?$referrer:'0')).' value=1',$influxtime);
             
             if(SAVE_REFERRER)
             {
