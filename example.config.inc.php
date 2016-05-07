@@ -1,5 +1,5 @@
 <?php 
-//InfluxDB reporting
+//InfluxDB reporting. If you don't need it, just leave the host field empty
 define('INFLUX_HOST','');
 define('INFLUX_HOST_UDP_PORT','');
 define('INFLUX_HOST_MEASUREMENT','pictshare');

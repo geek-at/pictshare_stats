@@ -8,18 +8,29 @@ $dev = false;
 
 echo "[+] Started..\n";
 
-$lines = file(LOG_FILE,FILE_SKIP_EMPTY_LINES);
 if(file_exists('cache/lasttime.txt'))
    $lasttime = trim(implode("",file('cache/lasttime.txt')));
 else $lasttime=0;
 
+//since we might want to check the logs and send them to influx more often
+if(INFLUX_HOST)
+{
+    $influxsent = 0;
+    if(file_exists('cache/lastinflux.txt'))
+    $lastinflux = trim(implode("",file('cache/lastinflux.txt')));
+    else $lastinflux=0;
+}
+
 if($dev) $lasttime=0;
 
-if($lasstime)
+if($lasttime)
     echo "[#] Lasttime: ".date("d.m (H:i)",$lasttime)."\n";
 $stats = array();
-foreach($lines as $line)
-{
+$handle = fopen(LOG_FILE, "r");
+if ($handle)
+    while (($line = fgets($handle)) !== false)
+    {
+        $line = trim($line);
         $i++;
         $type = false;
         $hash = false;
@@ -32,8 +43,7 @@ foreach($lines as $line)
         $responsecode = $arr[8];
         $referrer = str_replace('"', '', $arr[10]);
         $arr2 = explode('/', $path);
-        if(count($arr2)<2){continue;}
-
+        if(count($arr2)<2){continue;}       
         $timestring = substr($time,1);
         $tarr = explode('/',$timestring);
         $day = $tarr[0];
@@ -42,33 +52,27 @@ foreach($lines as $line)
         $year = $tarr[0];
         $hour = $tarr[1];
         $min = $tarr[2];
-        $sec = $tarr[3];
-
+        $sec = $tarr[3];        
         $time = strtotime("$day-$month-$year $hour:$min:$sec");
         
-        $agent = str_replace('"', '', implode(' ',array_slice($arr, 11)));
-
+        $agent = str_replace('"', '', implode(' ',array_slice($arr, 11)));      
         if($time<$lasttime || $responsecode!=200)
-           {continue;}
-        else $lasttime = $time;
-
-        if($dev) echo "Analyzing $path. Is image? ".(isThatAnImage($path)?'Yes':'No')."\n";
-
+        {continue;}
+        else $lasttime = $time;     
+        if($dev) echo "Analyzing $path. Is image? ".(isThatAnImage($path)?'Yes':'No')."\n";     
         if(isThatAnImage($path))
         {            
             if(!$data[$path])
-                $data[$path] = getDataFromURL($path);
-
+                $data[$path] = getDataFromURL($path);       
             $hash = $data[$path]['hash'];
-            $size = $data[$path]['size'];
-
-            if(!$hash || !$size) continue;
-
+            $size = $data[$path]['size'];       
+            if(!$hash || !$size) continue;      
             if(!$dev) echo "\rGot ".++$count.' requests';
             
-            if(INFLUX_HOST)
+            if(INFLUX_HOST && $time>$lastinflux)
             {
                 $influxtime = $time.'000000000';
+                ++$influxsent;
                 sendToInflux('hash='.$hash.',ip='.$ip.',referrer='.sanatizeStringForInflux(($referrer?$referrer:'0')).' value=1,size='.$size,$influxtime);
             }
             
@@ -82,16 +86,14 @@ foreach($lines as $line)
                 fwrite($fp,trim($referrer)."\n");
                 fclose($fp);
             }
-            
-
+                    
             $stats[$hash]['count']++;
             $stats[$hash]['traffic']+=$size;
-            $mosttraffic[$hash]+=$size;
-
+            $mosttraffic[$hash]+=$size;     
             $alltraffic+=$size;
             $allhits++;
         }
-}
+    }
 
 echo "\r[+] Done analyzing..\n\n---------------\n\n";
 $lasttime = (time()-1);
@@ -99,6 +101,17 @@ $lasttime = (time()-1);
 $fh = fopen("cache/lasttime.txt","w");
 fwrite($fh,$lasttime);
 fclose($fh);
+
+if(INFLUX_HOST)
+{
+    echo "\r\n[+] Sent $influxsent packages to influx\n\n---------------\n\n";
+    $lastinflux = (time()-1);
+    $fh = fopen("cache/lastinflux.txt","w");
+    fwrite($fh,$lastinflux);
+    fclose($fh);
+    if($argv[1]=='onlyinflux')
+        die("[X] Stopping since cli arg told me to ;)\n");
+}
 
 if(is_array($mosttraffic))
 {
