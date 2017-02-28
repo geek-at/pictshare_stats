@@ -1,5 +1,7 @@
 <?php
 error_reporting(E_ALL & ~E_NOTICE);
+define('DS', DIRECTORY_SEPARATOR);
+define('ROOT', dirname(__FILE__));
 
 if(!file_exists('config.inc.php')) exit('[X] Rename example.config.inc.php to config.inc.php first and set your values');
 include_once('config.inc.php');
@@ -189,6 +191,9 @@ if(FILL_ZERO_VALUES)
         closedir($handle);
     }
     echo "\n\n";
+    echo "[~] Cleaning up multiple zeros in a row\n";
+    cleanUp();
+    echo "Done\n";
 }
 echo "[FIN] Exiting..\n\n";
 
@@ -294,4 +299,64 @@ function sendToInflux($data,$time)
 	$socket = stream_socket_client("udp://".INFLUX_HOST.":".INFLUX_HOST_UDP_PORT);
 	stream_socket_sendto($socket, INFLUX_HOST_MEASUREMENT.','.$data.' '.$time);
 	stream_socket_shutdown($socket, STREAM_SHUT_RDWR);
+}
+
+function cleanUp()
+{
+    if ($handle = opendir('cache/'))
+    {
+        while (false !== ($file = readdir($handle)))
+        {
+            if ($file != "." && $file != "..")
+            {
+                $filepath = ROOT.DS.'cache'.DS.$file.DS.'view_log.csv';
+                if(is_dir('cache/'.$file) && isThatAnImage($filepath))
+                {
+                    removeZeroValues($filepath);
+                }
+            }
+        }
+        closedir($handle);
+    }
+}
+
+function removeZeroValues($file)
+{
+    $temp_table = fopen($file.'.tmp','w');
+    $lastviews = 0;
+    $emptycount = 0;
+
+    $handle = fopen($file,'r');
+    if ($handle)
+    {
+        while (($line = fgets($handle)) !== false)
+        {
+            
+            $line = trim($line);
+            $a = explode(';',$line);
+            $traffic = $a[2];
+            $views = $a[3];
+            $count = $a[1];
+            if($count>0 && is_numeric($traffic) && is_numeric($views))
+            {
+                $lastviews = $views;
+                fwrite($temp_table,$line."\n");
+            }
+            else if($count==0)
+            {
+                $emptycount++;
+            }
+        }
+            
+
+        fclose($handle);
+    }
+
+    echo "  [~]Removed $emptycount zero values from $file\n";
+
+    fclose($temp_table);
+
+    //rename($file,$file.'.orig');
+    rename($file.'.tmp',$file);
+    
 }

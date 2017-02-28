@@ -1,0 +1,28 @@
+body {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #333;
+    background-image: url('imgs/bg.png');
+    background-repeat: no-repeat;
+    background-color: #fff;
+}
+
+#headcontainer
+{
+    padding-top:20px;
+    margin-left:100px;
+}
+
+.well {
+    min-height: 20px;
+    padding: 19px;
+    margin-bottom: 20px;
+    border: 1px solid #e3e3e3;
+    border-radius: 4px;
+
+    background: rgb(245, 245, 245); /* Fall-back for browsers that don't                        support rgba */
+    background: rgba(245, 245, 245, .8);
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+}
