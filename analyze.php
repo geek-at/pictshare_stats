@@ -325,13 +325,13 @@ function removeZeroValues($file)
     $temp_table = fopen($file.'.tmp','w');
     $lastviews = 0;
     $emptycount = 0;
+    $lastcount = 0;
 
     $handle = fopen($file,'r');
     if ($handle)
     {
         while (($line = fgets($handle)) !== false)
         {
-            
             $line = trim($line);
             $a = explode(';',$line);
             $traffic = $a[2];
@@ -344,15 +344,21 @@ function removeZeroValues($file)
             }
             else if($count==0)
             {
-                $emptycount++;
+                if($lastcount>0) //write if the last value wasn't 0
+                {
+                    fwrite($temp_table,$line."\n"); //because we want to save one 0 per interval
+                }
+                else
+                    $emptycount++;
             }
+            $lastcount = $count;
         }
             
 
         fclose($handle);
     }
 
-    echo "  [~]Removed $emptycount zero values from $file\n";
+    echo "  [~]Removed $emptycount\tzero values from $file\n";
 
     fclose($temp_table);
 

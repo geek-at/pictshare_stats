@@ -47,7 +47,7 @@ function getViewCount(hash)
 {
 	$.ajax({
         type: "GET",
-        url: "cache/"+hash+"/hits.txt",
+        url: "cache/"+hash+"/hits.txt?"+Math.random(),
         dataType: "text",
         success: function(data) {$("#views").html('<h2>Was seen '+data+' times</h2>');},
         error:  function(data) {fail = true}
@@ -58,7 +58,7 @@ function getAllTrafficCount()
 {
 	$.ajax({
         type: "GET",
-        url: "cache/traffic.txt",
+        url: "cache/traffic.txt?"+Math.random(),
         dataType: "text",
         success: function(data) {$("#all_served").append(', '+filesize(parseInt(data))+" traffic");},
         error:  function(data) {fail = true}
@@ -69,7 +69,7 @@ function getAllHits()
 {
 	$.ajax({
         type: "GET",
-        url: "cache/hits.txt",
+        url: "cache/hits.txt?"+Math.random(),
         dataType: "text",
         success: function(data) {$("#all_served").html('Server stats: '+data+' views');getAllTrafficCount();},
         error:  function(data) {fail = true}
@@ -80,7 +80,7 @@ function getTrafficCount(hash)
 {
 	$.ajax({
         type: "GET",
-        url: "cache/"+hash+"/traffic.txt",
+        url: "cache/"+hash+"/traffic.txt?"+Math.random(),
         dataType: "text",
         success: function(data) {$("#traffic").html('<h2>Has so far produced '+filesize(parseInt(data))+' traffic</h2>');},
         error:  function(data) {fail = true}
