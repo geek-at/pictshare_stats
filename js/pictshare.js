@@ -98,16 +98,27 @@ function getLogData(hash)
      });
 }
 
-function renderNewViews(data)
+function renderNewViews(odata)
 {
     $("#content").append('<div id="view_chart" style="width: auto; height: 500px"></div>');
 
-        var data = google.visualization.arrayToDataTable(data);
-
+        var data = google.visualization.arrayToDataTable(odata);
+        
         var options = {
           title: 'Views per interval',
           curveType: 'function',
           legend: { position: 'bottom' },
+          explorer: { 
+                actions: ['dragToZoom', 'rightClickToReset'],
+                axis: 'horizontal',
+                keepInBounds: true,
+                maxZoomIn: 8.0
+        },
+          hAxis: {
+            viewWindow: {
+                min: odata[1][0].v
+            }
+          },
           vAxis: { 
               viewWindow:{
                 min:0
@@ -115,7 +126,7 @@ function renderNewViews(data)
           }
         };
 
-        var chart = new google.visualization.LineChart(document.getElementById('view_chart'));
+        var chart = new google.visualization.ColumnChart(document.getElementById('view_chart'));
 
         chart.draw(data, options);
 }
@@ -129,12 +140,14 @@ function renderViews(data)
         var options = {
           title: 'All views as of interval',
           curveType: 'function',
+           interpolateNulls: true,
           legend: { position: 'bottom' },
-          vAxis: { 
-              viewWindow:{
-                min:0
-              }
-          }
+          explorer: { 
+                actions: ['dragToZoom', 'rightClickToReset'],
+                axis: 'horizontal',
+                keepInBounds: true,
+                maxZoomIn: 8.0
+        }
         };
 
         var chart = new google.visualization.LineChart(document.getElementById('allview_chart'));
@@ -151,12 +164,14 @@ function renderTraffic(data)
         var options = {
           title: 'Traffic as of interval',
           curveType: 'function',
+          interpolateNulls: true,
           legend: { position: 'bottom' },
-          vAxis: { 
-              viewWindow:{
-                min:0
-              }
-          }
+          explorer: { 
+                actions: ['dragToZoom', 'rightClickToReset'],
+                axis: 'horizontal',
+                keepInBounds: true,
+                maxZoomIn: 8.0
+        }
         };
 
         var chart = new google.visualization.LineChart(document.getElementById('traffic_chart'));
@@ -186,7 +201,7 @@ function processLogData(allText) {
         var traffic = parseInt(entries[2]);
         var allviews = parseInt(entries[3]);
         
-        newviewdata[newviewdata.length] = [new Date(time*1000),views];
+        newviewdata[newviewdata.length] = [{v: new Date(time*1000)}, views];
         viewdata[viewdata.length] = [new Date(time*1000),allviews];
         trafficdata[trafficdata.length] = [new Date(time*1000),parseFloat((traffic/1000000).toFixed(2))];
     }

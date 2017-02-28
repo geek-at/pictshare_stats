@@ -325,7 +325,8 @@ function removeZeroValues($file)
     $temp_table = fopen($file.'.tmp','w');
     $lastviews = 0;
     $emptycount = 0;
-    $lastcount = 0;
+    $lastcount = false;
+    $lasttraffic = 0;
 
     $handle = fopen($file,'r');
     if ($handle)
@@ -337,9 +338,9 @@ function removeZeroValues($file)
             $traffic = $a[2];
             $views = $a[3];
             $count = $a[1];
+            $time = $a[0];
             if($count>0 && is_numeric($traffic) && is_numeric($views))
             {
-                $lastviews = $views;
                 fwrite($temp_table,$line."\n");
             }
             else if($count==0)
@@ -351,7 +352,9 @@ function removeZeroValues($file)
                 else
                     $emptycount++;
             }
+            $lastviews = $views;
             $lastcount = $count;
+            $lasttraffic = $traffic;
         }
             
 
